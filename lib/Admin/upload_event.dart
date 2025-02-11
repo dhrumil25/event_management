@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:intl/intl.dart';
 import 'package:random_string/random_string.dart';
 import '../Services/database.dart';
 
@@ -12,11 +13,14 @@ class UploadEvent extends StatefulWidget {
 }
 
 class _UploadEventState extends State<UploadEvent> {
+  DateTime? _selectedDate;
+  TimeOfDay? _selectedTime;
   File? _selectedImage;
   String? dropdownValue;
   var eventName = TextEditingController();
   var ticketPrice = TextEditingController();
   var eventDetail = TextEditingController();
+  var eventLocation = TextEditingController();
 
   var categories = [
     'Music',
@@ -30,6 +34,33 @@ class _UploadEventState extends State<UploadEvent> {
     final _pickImage = await imagePicker.pickImage(source: ImageSource.gallery);
     _selectedImage = File(_pickImage!.path);
     setState(() {});
+  }
+
+  Future<void> _selectDate(BuildContext context) async {
+    DateTime? pickedDate = await showDatePicker(
+      context: context,
+      initialDate: _selectedDate ?? DateTime.now(),
+      firstDate: DateTime(2000),
+      lastDate: DateTime(2100),
+    );
+    if (pickedDate != null && pickedDate != _selectedDate) {
+      setState(() {
+        _selectedDate = pickedDate;
+      });
+    }
+  }
+
+  Future<void> _selectTime(BuildContext context) async {
+    TimeOfDay? pickedTime = await showTimePicker(
+      context: context,
+      initialTime: TimeOfDay.now(),
+    );
+
+    if (pickedTime != null && pickedTime != _selectedTime) {
+      setState(() {
+        _selectedTime = pickedTime;
+      });
+    }
   }
 
   @override
@@ -87,7 +118,9 @@ class _UploadEventState extends State<UploadEvent> {
             const Text(
               'Event Name',
               style: TextStyle(
-                  color: Colors.black, fontSize: 20, fontWeight: FontWeight.w500),
+                  color: Colors.black,
+                  fontSize: 20,
+                  fontWeight: FontWeight.w500),
             ),
             const SizedBox(height: 10),
             Container(
@@ -118,7 +151,9 @@ class _UploadEventState extends State<UploadEvent> {
             const Text(
               'Ticket Price',
               style: TextStyle(
-                  color: Colors.black, fontSize: 20, fontWeight: FontWeight.w500),
+                  color: Colors.black,
+                  fontSize: 20,
+                  fontWeight: FontWeight.w500),
             ),
             const SizedBox(height: 10),
             Container(
@@ -129,6 +164,7 @@ class _UploadEventState extends State<UploadEvent> {
                 color: Color(0xFFEADDDD),
               ),
               child: TextField(
+                keyboardType: TextInputType.number,
                 controller: ticketPrice,
                 decoration: const InputDecoration(
                   border: InputBorder.none,
@@ -138,9 +174,35 @@ class _UploadEventState extends State<UploadEvent> {
             ),
             const SizedBox(height: 20),
             const Text(
+              'Event Location',
+              style: TextStyle(
+                  color: Colors.black,
+                  fontSize: 20,
+                  fontWeight: FontWeight.w500),
+            ),
+            const SizedBox(height: 10),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              width: MediaQuery.of(context).size.width,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(10),
+                color: Color(0xFFEADDDD),
+              ),
+              child: TextField(
+                controller: eventLocation,
+                decoration: const InputDecoration(
+                  border: InputBorder.none,
+                  hintText: 'Enter Location',
+                ),
+              ),
+            ),
+            const SizedBox(height: 20),
+            const Text(
               'Select Category',
               style: TextStyle(
-                  color: Colors.black, fontSize: 20, fontWeight: FontWeight.w500),
+                  color: Colors.black,
+                  fontSize: 20,
+                  fontWeight: FontWeight.w500),
             ),
             const SizedBox(height: 10),
             Container(
@@ -177,10 +239,49 @@ class _UploadEventState extends State<UploadEvent> {
               ),
             ),
             const SizedBox(height: 20),
+            Row(
+              children: [
+                IconButton(
+                  onPressed: () => _selectDate(context),
+                  icon: const Icon(
+                    Icons.calendar_month,
+                    color: Color(0xFF4133FF),
+                    size: 25,
+                  ),
+                ),
+                Text(
+                  _selectedDate == null
+                      ? "No date selected"
+                      : DateFormat('yyyy-MM-dd').format(_selectedDate!),
+                  style:
+                      const TextStyle(fontSize: 18, color: Color(0xFF4133FF)),
+                ),
+                IconButton(
+                  onPressed: () => _selectTime(context),
+                  icon: const Icon(
+                    Icons.access_time,
+                    color: Color(0xFF4133FF),
+                    size: 25,
+                  ),
+                ),
+                Text(
+                  _selectedTime == null
+                      ? 'No time selected'
+                      : _selectedTime!.format(context),
+                  style: const TextStyle(
+                    fontSize: 18,
+                    color: Color(0xFF4133FF),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 20),
             const Text(
               'Event Detail',
               style: TextStyle(
-                  color: Colors.black, fontSize: 20, fontWeight: FontWeight.w500),
+                  color: Colors.black,
+                  fontSize: 20,
+                  fontWeight: FontWeight.w500),
             ),
             const SizedBox(height: 10),
             Container(
@@ -201,105 +302,89 @@ class _UploadEventState extends State<UploadEvent> {
             ),
             const SizedBox(height: 20),
             ElevatedButton(
-
               style: const ButtonStyle(
                 backgroundColor: MaterialStatePropertyAll(Color(0xFF4133FF)),
               ),
               onPressed: () async {
-                if (eventName.text.isNotEmpty &&
-                    ticketPrice.text.isNotEmpty &&
-                    dropdownValue != null &&
-                    eventDetail.text.isNotEmpty &&
-                    _selectedImage != null) {
-                  showDialog(
-                    context: context,
-                    builder: (BuildContext context) {
-                      return AlertDialog(
-                        title: const Text("Confirmation"),
-                        content: const Text(
-                            "Are you sure you want to upload this event?"),
-                        actions: [
-                          TextButton(
-                            child: const Text(
-                              "Cancel",
-                              style: TextStyle(color: Colors.amber),
-                            ),
-                            onPressed: () {
-                              Navigator.of(context).pop();
-                            },
-                          ),
-                          TextButton(
-                            child: const Text(
-                              "Submit",
-                              style: TextStyle(color: Colors.amber),
-                            ),
-                            onPressed: () async {
-                              Navigator.of(context)
-                                  .pop(); // Close the dialog before proceeding
-                              try {
-                                String id = randomAlphaNumeric(10);
-                                Map<String, dynamic> uploadEvent = {
-                                  "Image":
-                                      "", // You might need to add image upload logic
-                                  "Name": eventName.text,
-                                  "Price": ticketPrice.text,
-                                  "Category": dropdownValue,
-                                  "Event Details": eventDetail.text,
-                                };
-                                await DatabaseMethods()
-                                    .addEventDetails(uploadEvent, id);
-
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(
-                                    backgroundColor: Colors.green,
-                                    behavior: SnackBarBehavior.floating,
-                                    margin: EdgeInsets.all(10),
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius:
-                                          BorderRadius.all(Radius.circular(5)),
-                                    ),
-                                    content: Text(
-                                      'Event Uploaded Successfully!',
-                                      style: TextStyle(fontSize: 15),
-                                    ),
-                                  ),
-                                );
-                              } catch (e) {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(
-                                    backgroundColor: Colors.red,
-                                    behavior: SnackBarBehavior.floating,
-                                    margin: const EdgeInsets.all(10),
-                                    shape: const RoundedRectangleBorder(
-                                      borderRadius:
-                                          BorderRadius.all(Radius.circular(5)),
-                                    ),
-                                    content: Text(
-                                      'Error uploading event: $e',
-                                      style: const TextStyle(fontSize: 15),
-                                    ),
-                                  ),
-                                );
-                              }
-                            },
-                          ),
-                        ],
-                      );
-                    },
-                  );
-                } else {
+                if (eventName.text.isEmpty ||
+                    ticketPrice.text.isEmpty ||
+                    dropdownValue == null ||
+                    eventDetail.text.isEmpty ||
+                    _selectedImage == null ||
+                    _selectedDate == null ||
+                    _selectedTime == null) {
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(
                       backgroundColor: Colors.orange,
-                      behavior: SnackBarBehavior.floating,
-                      margin: EdgeInsets.all(10),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.all(Radius.circular(5)),
+                      content:
+                          Text('Please fill all fields and upload an image.'),
+                    ),
+                  );
+                  return;
+                }
+
+                bool confirm = await showDialog(
+                  context: context,
+                  builder: (context) => AlertDialog(
+                    title: const Text("Confirmation"),
+                    content: const Text(
+                        "Are you sure you want to upload this event?"),
+                    actions: [
+                      TextButton(
+                        onPressed: () => Navigator.pop(context, false),
+                        child: const Text("Cancel",
+                            style: TextStyle(color: Colors.amber)),
                       ),
-                      content: Text(
-                        'Please fill all the fields and upload an image.',
-                        style: TextStyle(fontSize: 15),
+                      TextButton(
+                        onPressed: () => Navigator.pop(context, true),
+                        child: const Text("Submit",
+                            style: TextStyle(color: Colors.amber)),
                       ),
+                    ],
+                  ),
+                );
+
+                if (!confirm) return;
+
+                try {
+                  String id = randomAlphaNumeric(10);
+                  String formattedDate =
+                      DateFormat('dd MMM').format(_selectedDate!);
+                  String formattedTime = DateFormat('hh:mm a').format(DateTime(
+                      0, 0, 0, _selectedTime!.hour, _selectedTime!.minute));
+
+                  await DatabaseMethods().addEventDetails({
+                    "Image": "", // Handle image upload separately
+                    "Name": eventName.text,
+                    "Price": ticketPrice.text,
+                    "Category": dropdownValue,
+                    "Event Details": eventDetail.text,
+                    "Location": eventLocation.text,
+                    "Date": formattedDate,
+                    "Time": formattedTime,
+                  }, id);
+
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      backgroundColor: Colors.green,
+                      content: Text('Event Uploaded Successfully!'),
+                    ),
+                  );
+                  setState(() {
+                    eventName.clear();
+                    ticketPrice.clear();
+                    eventDetail.clear();
+                    eventLocation.clear();
+                    dropdownValue = null;
+                    _selectedImage = null;
+                    _selectedDate = null;
+                    _selectedTime = null;
+                  });
+                } catch (e) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      backgroundColor: Colors.red,
+                      content: Text('Error uploading event: $e'),
                     ),
                   );
                 }
@@ -307,12 +392,11 @@ class _UploadEventState extends State<UploadEvent> {
               child: const Text(
                 'Upload',
                 style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 22,
-                  fontWeight: FontWeight.bold,
-                ),
+                    color: Colors.white,
+                    fontSize: 22,
+                    fontWeight: FontWeight.bold),
               ),
-            ),
+            )
           ],
         ),
       ),

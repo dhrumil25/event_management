@@ -1,7 +1,22 @@
 import 'package:flutter/material.dart';
 
 class DetailPage extends StatefulWidget {
-  const DetailPage({super.key});
+  final String image;
+  final String name;
+  final String location;
+  final String date;
+  final String eventDetails;
+  final String price;
+
+  const DetailPage({
+    super.key,
+    required this.image,
+    required this.name,
+    required this.location,
+    required this.date,
+    required this.eventDetails,
+    required this.price,
+  });
 
   @override
   State<DetailPage> createState() => _DetailPageState();
@@ -45,37 +60,37 @@ class _DetailPageState extends State<DetailPage> {
                   decoration: const BoxDecoration(
                     color: Colors.black45,
                   ),
-                  child: const Column(
+                  child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Dua lipa Concert',
-                        style: TextStyle(
+                        widget.name,
+                        style: const TextStyle(
                             color: Colors.white,
                             fontSize: 30,
                             fontWeight: FontWeight.bold),
                       ),
                       Row(
                         children: [
-                          Icon(
+                          const Icon(
                             Icons.calendar_month,
                             color: Colors.white,
                           ),
                           Text(
-                            '2 May 2025',
-                            style: TextStyle(
+                            widget.date,
+                            style: const TextStyle(
                               color: Color(0xFFFAF9F6),
                               fontSize: 20,
                             ),
                           ),
-                          SizedBox(width: 10),
-                          Icon(
+                          const SizedBox(width: 10),
+                          const Icon(
                             Icons.location_on_outlined,
                             color: Colors.white,
                           ),
                           Text(
-                            'Vadodara, India',
-                            style: TextStyle(
+                            widget.location,
+                            style: const TextStyle(
                               color: Color(0xFFFAF9F6),
                               fontSize: 20,
                             ),
@@ -99,11 +114,11 @@ class _DetailPageState extends State<DetailPage> {
                   color: Colors.black),
             ),
           ),
-          const Padding(
-            padding: EdgeInsets.only(left: 20),
+           Padding(
+            padding: const EdgeInsets.only(left: 20),
             child: Text(
-              'It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using makitheir de in their in',
-              style: TextStyle(
+              widget.eventDetails,
+              style: const TextStyle(
                   fontSize: 17,
                   color: Colors.black,
                   fontWeight: FontWeight.w400),
@@ -162,20 +177,20 @@ class _DetailPageState extends State<DetailPage> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text(
-                  'Book Now: ₹2000',
-                  style: TextStyle(
+                Text(
+                  'Amount: \₹${widget.price}',
+                  style: const TextStyle(
                       color: Color(0xFF4D68EE),
                       fontSize: 25,
                       fontWeight: FontWeight.bold),
                 ),
                 Container(
-                  padding: EdgeInsets.all(5),
+                  padding: const EdgeInsets.all(5),
                   decoration: BoxDecoration(
                     color: const Color(0xFF4D68EE),
                     borderRadius: BorderRadius.circular(5),
                   ),
-                  child: Text(
+                  child: const Text(
                     '  Book Now  ',
                     style: TextStyle(
                         color: Colors.white,
