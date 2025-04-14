@@ -15,8 +15,22 @@ class DatabaseMethods {
         .set(userInfoMap);
   }
 
- Stream<QuerySnapshot> getallEvents() {
-  return FirebaseFirestore.instance.collection('Event Details').snapshots();
-}
+  Stream<QuerySnapshot> getallEvents() {
+    return FirebaseFirestore.instance.collection('Event Details').snapshots();
+  }
 
+  Future<void> addUserBooking(
+      String userId, Map<String, dynamic> userInfoMap) async {
+    await FirebaseFirestore.instance
+        .collection("users")
+        .doc(userId)
+        .collection("Booking")
+        .add(userInfoMap);
+  }
+
+  Future<void> addAdminTicket(Map<String, dynamic> userInfoMap) async {
+    await FirebaseFirestore.instance
+        .collection("adminTickets")
+        .add(userInfoMap);
+  }
 }

@@ -1,12 +1,13 @@
+import 'package:event_booking_app/Services/data.dart';
 import 'package:event_booking_app/pages/bottomnav.dart';
-import 'package:event_booking_app/pages/home.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-
-import 'Admin/upload_event.dart';
+import 'package:flutter_stripe/flutter_stripe.dart';
 
 void main() async{
   WidgetsFlutterBinding.ensureInitialized();
+  Stripe.publishableKey=publishedKey;
+  await Stripe.instance.applySettings();
   await Firebase.initializeApp();
   runApp(const MyApp());
 }

@@ -4,6 +4,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
+import 'shared_pref.dart';
+
 class AuthMethods {
   final FirebaseAuth auth = FirebaseAuth.instance;
 
@@ -24,7 +26,12 @@ class AuthMethods {
 
       // Getting users credential
       UserCredential result = await auth.signInWithCredential(authCredential);
+
       User? user = result.user;
+      await SharedPrefsHelper.saveUserEmail(user!.email!);
+      await SharedPrefsHelper.saveUsername(user!.displayName!);
+      await SharedPrefsHelper.saveUserImage(user!.photoURL!);
+      await SharedPrefsHelper.saveUserId(user!.uid!);
 
       Map<String, dynamic> userInfoMap = {
         "Name": user!.displayName,
@@ -56,6 +63,6 @@ class AuthMethods {
           ),
         );
       });
-        }
+    }
   }
 }

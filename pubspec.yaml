@@ -44,6 +44,9 @@ dependencies:
   image_picker:
   random_string:
   intl:
+  http:
+  flutter_stripe:
+  shared_preferences:
 
 
 
