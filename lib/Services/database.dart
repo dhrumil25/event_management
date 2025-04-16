@@ -33,4 +33,12 @@ class DatabaseMethods {
         .collection("adminTickets")
         .add(userInfoMap);
   }
+
+  Stream<QuerySnapshot<Map<String, dynamic>>> getBookings(String id) {
+    return FirebaseFirestore.instance
+        .collection('users')
+        .doc(id)
+        .collection("Booking")
+        .snapshots();
+  }
 }
