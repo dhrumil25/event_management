@@ -1,6 +1,6 @@
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:event_booking_app/pages/booking.dart';
-import 'package:event_booking_app/pages/home.dart';
+import 'package:event_booking_app/pages/UserHome.dart';
 import 'package:event_booking_app/pages/profile.dart';
 import 'package:flutter/material.dart';
 
@@ -14,9 +14,9 @@ class BottomNav extends StatefulWidget {
 class _BottomNavState extends State<BottomNav> {
   int _currentIndex = 0;
   final List<Widget> _pages = [
-    Home(),
+    UserHome(),
     Booking(),
-    Profile(),
+    UserProfileScreen(),
   ];
   @override
   Widget build(BuildContext context) {

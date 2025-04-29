@@ -39,6 +39,7 @@ dependencies:
   firebase_core:
   firebase_auth:
   google_sign_in:
+  flutter_signin_button:
   cloud_firestore:
   firebase_storage:
   image_picker:
@@ -47,6 +48,10 @@ dependencies:
   http:
   flutter_stripe:
   shared_preferences:
+  geolocator:
+  geocoding:
+  permission_handler:
+  google_fonts:
 
 
 

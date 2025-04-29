@@ -4,25 +4,45 @@ import 'package:event_booking_app/Services/database.dart';
 import 'package:event_booking_app/pages/details_page.dart';
 import 'package:flutter/material.dart';
 
-class Home extends StatefulWidget {
-  const Home({super.key});
+import '../Services/location_service.dart';
+
+class UserHome extends StatefulWidget {
+  const UserHome({super.key});
 
   @override
-  State<Home> createState() => _HomeState();
+  State<UserHome> createState() => _UserHomeState();
 }
 
-class _HomeState extends State<Home> {
+class _UserHomeState extends State<UserHome> {
   Stream<QuerySnapshot>? eventStream;
+  String currentLocation = "Fetching location...";
+  int eventCount = 0;
 
   void onTheLoad() {
     eventStream = DatabaseMethods().getallEvents();
     setState(() {});
   }
 
+  void fetchData() async {
+  eventStream = DatabaseMethods().getallEvents();
+
+  // Get real-time human-readable address
+  String loc = await LocationService().getCurrentAddress();
+
+  eventStream?.listen((snapshot) {
+    setState(() {
+      eventCount = snapshot.docs.length;
+      currentLocation = loc;
+    });
+  });
+}
+
+
   @override
   void initState() {
     super.initState();
     onTheLoad();
+    fetchData();
   }
 
   Widget allEvents() {
@@ -162,12 +182,15 @@ class _HomeState extends State<Home> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Row(
+              Row(
                 children: [
-                  Icon(Icons.location_on_outlined),
-                  Text(
-                    'Waghodia, Vadodara',
-                    style: TextStyle(color: Colors.black, fontSize: 20),
+                  const Icon(Icons.location_on_outlined),
+                  Flexible(
+                    child: Text(
+                      currentLocation,
+                      style: const TextStyle(color: Colors.black, fontSize: 16),
+                      overflow: TextOverflow.ellipsis,
+                    ),
                   ),
                 ],
               ),
@@ -181,10 +204,10 @@ class _HomeState extends State<Home> {
                 ),
               ),
               const SizedBox(height: 10),
-              const Text(
-                'There are 20 events\naround your location.',
-                style: TextStyle(
-                  fontSize: 25,
+              Text(
+                'There are $eventCount events\naround your location.',
+                style: const TextStyle(
+                  fontSize: 22,
                   color: Color(0xff6351ec),
                   fontWeight: FontWeight.bold,
                 ),
